@@ -138,7 +138,7 @@ func main() {
 							colorCount = 0
 						}
 					}
-					if min > max {
+					if min > max || min == max {
 						if colorCount == min-1 {
 							fmt.Print(string(Paint), (char[i]))
 						} else {
@@ -156,5 +156,10 @@ func main() {
 		tempOutput = nil
 		// once the word has been printed, we want to reset tempOutput to nil, ready to be filled
 		// by the next string element in inputString.
+		// to run this file:
+		// to print all letters in colour: go run main.go [string] [banner] --color=<color>
+		// to print a set of letters in colour: go run main.go [string] [banner] --color=<color> start==int end==int
+		// to print one letter either: go run main.go [string] [banner] --color=<color> start==int end==0
+		// or go run main.go [string] [banner] --color=<color> start==int end==int --> where start and end integers are equal
 	}
 }
