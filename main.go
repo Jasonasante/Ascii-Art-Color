@@ -1,33 +1,47 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"strings"
 )
 
-type Color string
-
 const (
-	ColorReset  = "\033[0m"
-	ColorRed    = "\033[31m"
-	ColorGreen  = "\033[32m"
-	ColorYellow = "\033[33m"
-	ColorBlue   = "\033[34m"
-	ColorPurple = "\033[35m"
-	ColorCyan   = "\033[36m"
-	ColorWhite  = "\033[37m"
+	colorRed    = "\033[31m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorBlue   = "\033[34m"
+	colorPurple = "\033[35m"
+	colorWhite  = "\033[37m"
 )
 
-func colorise(color Color, s string) {
-	fmt.Print(string(color), s, string(ColorReset))
+// i dont know what this means lol.
+
+func ToLower(s string) string {
+	lowstr := []rune(s)
+	for i, char := range lowstr {
+		if char >= 65 && char <= 90 {
+			lowstr[i] = lowstr[i] + 32
+		}
+	}
+	return string(lowstr)
+}
+
+func TrimAtoi(s string) int {
+	myRunes := []rune(s)
+	num := 0
+	for _, b := range myRunes {
+		if b >= 48 && b <= 57 {
+			num = num*10 + int(b-'0')
+		}
+	}
+	return num
 }
 
 func main() {
 	var emptyString string
 	var inputString []string
-	if len(os.Args) == 4 {
+	if len(os.Args) == 4 || len(os.Args) == 6 {
 		inputString = strings.Split(os.Args[1], "\\n")
 		// this takes the argument that we are printing and seperates them into a []string via \n
 		// this will then therefore automatically will print each []string on a new line.
@@ -72,43 +86,70 @@ func main() {
 			}
 		}
 	}
-	// for _,strarr := range asciiSlice2{
-	// 	for _,str := range strarr{
-	// 		fmt.Println(str)
-	// 	}
-	// }
 
-	colorStr := "Color"
-	colorFlag := flag.Bool("color", false, "to colorise string")
-	flag.Parse()
-	for i := range os.Args[3] {
-		if os.Args[3][i] == 61 {
-			for j := i + 1; j < len(os.Args[3]); j++ {
-				colorStr += string(os.Args[3][j])
-			}
-		}
+	var colorFlag []string
+	if strings.HasPrefix(os.Args[3], "--color=") {
+		colorFlag = strings.Split(os.Args[3], "--color=")
 	}
+	fmt.Println("colorFlag=", colorFlag)
 
+	colorFlag[1] = ToLower(colorFlag[1])
+	Paint := colorWhite
+	if colorFlag[1] == "red" {
+		Paint = colorRed
+	}
+	if colorFlag[1] == "green" {
+		Paint = colorGreen
+	}
+	if colorFlag[1] == "yellow" {
+		Paint = colorYellow
+	}
+	if colorFlag[1] == "blue" {
+		Paint = colorBlue
+	}
+	if colorFlag[1] == "purple" {
+		Paint = colorPurple
+	}
+	// fmt.Println(len(os.Args))
+	colorCount := 0
 	var tempOutput [][]string
 	// why is it that when we used make, it did not print the first index?
-	for _, str := range inputString {
+	for j, str := range inputString {
 		for _, aRune := range str {
 			tempOutput = append(tempOutput, asciiSlice2[aRune-rune(32)])
 			// due to the loop it will append the bubble eqivalent of the every letter inside inputString
 		}
 		for i := range tempOutput[0] {
-			// why does it have to be 0???
-			// with tempout[4] the bro disappears but hello and there are printed.
-			// tempOutput[0] is the first slice of the 2D array ( which ssshould be the slice of
-			// bubble letters that make up inputString)
-			// i is each line inside the []string.
-			// so for the range of slice of tempout (which is the bublble version of inputString)
 			for _, char := range tempOutput {
-				if *colorFlag {
-					colorise(colorStr, char[i])
+				if len(os.Args) == 4 {
+					fmt.Print(string(Paint), (char[i]))
 				}
-				fmt.Print(char[i])
-				// this prints each line of each bubble letter
+				if len(os.Args) == 6 {
+					min := TrimAtoi(os.Args[4])
+					max := TrimAtoi(os.Args[5])
+					if max > min {
+						if colorCount >= min-1 && colorCount <= max-1 {
+							fmt.Print(string(Paint), (char[i]))
+						} else {
+							fmt.Print(string(colorWhite), (char[i]))
+						}
+						colorCount++
+						if colorCount == len(inputString[j]) {
+							colorCount = 0
+						}
+					}
+					if min > max {
+						if colorCount == min-1 {
+							fmt.Print(string(Paint), (char[i]))
+						} else {
+							fmt.Print(string(colorWhite), (char[i]))
+						}
+						colorCount++
+						if colorCount == len(inputString[j]) {
+							colorCount = 0
+						}
+					}
+				}
 			}
 			fmt.Println()
 		}
