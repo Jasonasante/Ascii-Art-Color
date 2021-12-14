@@ -91,7 +91,7 @@ func main() {
 	if strings.HasPrefix(os.Args[3], "--color=") {
 		colorFlag = strings.Split(os.Args[3], "--color=")
 	}
-	fmt.Println("colorFlag=", colorFlag)
+	//fmt.Println("colorFlag=", colorFlag)
 
 	colorFlag[1] = ToLower(colorFlag[1])
 	Paint := colorWhite
