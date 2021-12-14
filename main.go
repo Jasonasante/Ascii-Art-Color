@@ -13,10 +13,10 @@ const (
 	colorBlue   = "\033[34m"
 	colorPurple = "\033[35m"
 	colorWhite  = "\033[37m"
+	colorOrange = "\033[40m"
 )
 
-// i dont know what this means lol.
-
+// THIS IS TO LOWERCASE THE COLOR WANTED
 func ToLower(s string) string {
 	lowstr := []rune(s)
 	for i, char := range lowstr {
@@ -27,6 +27,7 @@ func ToLower(s string) string {
 	return string(lowstr)
 }
 
+// THIS IS TO EXTRACT THE POSITION OF THE LETTER THAT WANTS TO BE COLORED
 func TrimAtoi(s string) int {
 	myRunes := []rune(s)
 	num := 0
@@ -38,21 +39,25 @@ func TrimAtoi(s string) int {
 	return num
 }
 
+// THIS PUT CONVERTS A STRING INTO ASCII-BUBBLES WITH COLORS
 func main() {
 	var emptyString string
 	var inputString []string
-	if len(os.Args) == 4 || len(os.Args) == 6 {
+	if len(os.Args) == 3 || len(os.Args) == 5 {
 		inputString = strings.Split(os.Args[1], "\\n")
 		// this takes the argument that we are printing and seperates them into a []string via \n
 		// this will then therefore automatically will print each []string on a new line.
 	} else {
-		fmt.Println("Usage: go run . [STRING] [BANNER]")
-		fmt.Println("EX: go run . something standard")
+		fmt.Println("Usage: go run . [STRING] [OPTION]")
+		fmt.Println("EX: go run . something --color=<color>")
 		os.Exit(0)
 	}
-	// fmt.Println(inputString)
-	Content, _ := os.ReadFile(os.Args[2] + ".txt")
-	// fmt.Println(Content)
+	for _, ele := range inputString {
+		if ele == "" || ele == "\\n" {
+			os.Exit(0)
+		}
+	}
+	Content, _ := os.ReadFile("standard.txt")
 	asciiSlice2 := make([][]string, 95)
 	// this stores the ascii-bubbles in order of the
 	// there are 95 ascii characters and this lets us index the dimension holding each bubble
@@ -88,14 +93,13 @@ func main() {
 	}
 
 	var colorFlag []string
-	if strings.HasPrefix(os.Args[3], "--color=") {
-		colorFlag = strings.Split(os.Args[3], "--color=")
+	if strings.HasPrefix(os.Args[2], "--color=") {
+		colorFlag = strings.Split(os.Args[2], "--color=")
 	} else {
-		fmt.Println("Usage: go run . [STRING] [BANNER]")
-		fmt.Println("EX: go run . something standard")
+		fmt.Println("Usage: go run . [STRING] [OPTION]")
+		fmt.Println("EX: go run . something --color=<color>")
 		os.Exit(0)
 	}
-	// fmt.Println("colorFlag=", colorFlag)
 
 	colorFlag[1] = ToLower(colorFlag[1])
 	Paint := colorWhite
@@ -114,10 +118,12 @@ func main() {
 	if colorFlag[1] == "purple" {
 		Paint = colorPurple
 	}
-	// fmt.Println(len(os.Args))
+	if colorFlag[1] == "orange" {
+		Paint = colorOrange
+	}
+
 	colorCount := 0
 	var tempOutput [][]string
-	// why is it that when we used make, it did not print the first index?
 	for j, str := range inputString {
 		for _, aRune := range str {
 			tempOutput = append(tempOutput, asciiSlice2[aRune-rune(32)])
@@ -125,12 +131,12 @@ func main() {
 		}
 		for i := range tempOutput[0] {
 			for _, char := range tempOutput {
-				if len(os.Args) == 4 {
+				if len(os.Args) == 3 {
 					fmt.Print(string(Paint), (char[i]))
 				}
-				if len(os.Args) == 6 {
-					min := TrimAtoi(os.Args[4])
-					max := TrimAtoi(os.Args[5])
+				if len(os.Args) == 5 {
+					min := TrimAtoi(os.Args[3])
+					max := TrimAtoi(os.Args[4])
 					if max > min {
 						if colorCount >= min-1 && colorCount <= max-1 {
 							fmt.Print(string(Paint), (char[i]))
